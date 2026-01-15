@@ -1,166 +1,84 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gold VIP Access</title>
+<title>VIP Landing</title>
 
-<!-- Facebook Pixel -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init','YOUR_PIXEL_ID');
-fbq('track','PageView');
-</script>
-
-<!-- Firebase v8 -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#000;
-color:#ffd700;
-}
-.container{
-max-width:420px;
-margin:25px auto;
-padding:22px;
-background:rgba(255,215,0,.08);
-border-radius:20px;
-box-shadow:0 0 40px rgba(255,215,0,.25);
-}
-h1,h2{text-align:center;}
-.stats{
-display:flex;
-gap:10px;
-margin:15px 0;
-}
-.stat{
-flex:1;
-background:#111;
-padding:12px;
-border-radius:15px;
-text-align:center;
-}
-.timer{text-align:center;margin:15px 0;}
-.btn{
-width:100%;
-padding:15px;
-margin:10px 0;
-border:none;
-border-radius:15px;
-font-size:16px;
-font-weight:bold;
-background:linear-gradient(135deg,#ffd700,#ffb300);
-cursor:pointer;
-}
-.support{
-position:fixed;
-right:15px;
-bottom:90px;
-width:54px;
-height:54px;
-border-radius:50%;
-background:#ffd700;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:22px;
-text-decoration:none;
-color:#000;
-box-shadow:0 0 25px rgba(255,215,0,.7);
-}
-input{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:none;
-margin-bottom:10px;
-}
+body{margin:0;font-family:Arial;background:#000;color:#ffd700}
+.container{max-width:420px;margin:25px auto;padding:20px;background:rgba(255,215,0,.08);border-radius:20px}
+h1,h2{text-align:center}
+.btn{width:100%;padding:14px;margin:8px 0;border:none;border-radius:15px;background:#ffd700;font-weight:bold}
+input,textarea{width:100%;padding:10px;margin:6px 0;border-radius:10px;border:none}
+.logo{display:block;margin:0 auto 10px;max-width:120px}
+.support{position:fixed;right:15px;bottom:90px;width:55px;height:55px;border-radius:50%;background:#ffd700;display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;text-decoration:none}
+.adminBox{background:#111;padding:15px;border-radius:15px;margin-top:10px}
+.list{font-size:13px;margin-top:10px}
 </style>
 </head>
 
 <body>
 
-<!-- USER LANDING -->
+<!-- USER PAGE -->
 <div id="userPage">
   <div class="container">
-    <h1>👑 Gold VIP Access</h1>
+    <img id="siteLogo" class="logo" src="">
+    <h1 id="siteTitle">VIP Access</h1>
+    <p id="siteSub">Limited Offer</p>
 
-    <div class="stats">
-      <div class="stat">
-        <h2 id="live">0</h2>
-        <p>Live Users</p>
-      </div>
-      <div class="stat">
-        <h2 id="reg">0</h2>
-        <p>Registrations</p>
-      </div>
-    </div>
-
-    <div class="timer">
-      ⏳ Offer Ends In<br>
-      <strong id="time"></strong>
-    </div>
-
-    <button class="btn" onclick="register()">Free Registration</button>
-    <button class="btn" onclick="joinTG()">Join Telegram</button>
+    <button class="btn" id="btnReg"></button>
+    <button class="btn" id="btnTG"></button>
   </div>
 </div>
 
 <!-- ADMIN LOGIN -->
 <div id="adminLogin" style="display:none">
   <div class="container">
-    <h2>🔐 Admin Login</h2>
-    <input id="adminEmail" type="email" placeholder="Admin Email">
+    <h2>Admin Login</h2>
+    <input id="adminEmail" placeholder="Email">
     <input id="adminPass" type="password" placeholder="Password">
-    <button class="btn" onclick="adminLogin()">Login</button>
-    <p id="adminError" style="color:red;text-align:center"></p>
+    <button class="btn" onclick="login()">Login</button>
+    <p id="err" style="color:red;text-align:center"></p>
   </div>
 </div>
 
 <!-- ADMIN DASHBOARD -->
 <div id="adminDash" style="display:none">
   <div class="container">
-    <h2>📊 Admin Dashboard</h2>
-    <p>Live Users: <strong id="a_live">0</strong></p>
-    <p>Total Registrations: <strong id="a_reg">0</strong></p>
+    <h2>Admin Panel</h2>
+
+    <div class="adminBox">
+      <h3>Website Settings</h3>
+      <input id="logoInp" placeholder="Logo Image URL">
+      <input id="titleInp" placeholder="Heading Text">
+      <input id="subInp" placeholder="Sub Text">
+      <input id="regTextInp" placeholder="Register Button Text">
+      <input id="regLinkInp" placeholder="Register URL">
+      <input id="tgTextInp" placeholder="Telegram Button Text">
+      <input id="tgLinkInp" placeholder="Telegram URL">
+      <button class="btn" onclick="saveSettings()">Save</button>
+      <p id="saveMsg"></p>
+    </div>
+
+    <div class="adminBox">
+      <h3>Users</h3>
+      <div id="userList" class="list"></div>
+    </div>
+
     <button class="btn" onclick="logout()">Logout</button>
   </div>
 </div>
 
-<!-- Telegram Support -->
 <a class="support" href="https://t.me/yourusername" target="_blank">💬</a>
 
-<!-- Tawk.to -->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/YOUR_TAWK_ID';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-
 <script>
-// 🔗 CHANGE THESE LINKS
-const SIGNUP = "https://example.com/signup";
-const TG = "https://t.me/yourchannel";
-
-// 🔥 FIREBASE CONFIG (FINAL)
+// 🔥 FIREBASE CONFIG
 firebase.initializeApp({
   apiKey: "AIzaSyDpeyBpdODVkyZ3-uS1sgpBNHGAetrd5dM",
   databaseURL: "https://updatehubs-f3fe7-default-rtdb.firebaseio.com",
@@ -170,65 +88,71 @@ firebase.initializeApp({
 const db = firebase.database();
 const auth = firebase.auth();
 
-// Live users
-db.ref("live").transaction(n => (n || 0) + 1);
-db.ref("live").on("value", s => {
-  live.innerText = s.val() || 0;
-  a_live.innerText = s.val() || 0;
-});
-db.ref("reg").on("value", s => {
-  reg.innerText = s.val() || 0;
-  a_reg.innerText = s.val() || 0;
-});
-
-// Countdown
-let end = localStorage.endTime || Date.now() + 3600000;
-localStorage.endTime = end;
-setInterval(()=>{
-let d=end-Date.now();
-if(d<0)d=0;
-time.innerText =
-Math.floor(d/60000)+"m "+
-Math.floor((d%60000)/1000)+"s";
-},1000);
-
-// Buttons
-function register(){
-fbq('track','CompleteRegistration');
-db.ref("reg").transaction(n=>(n||0)+1);
-setTimeout(()=>location.href=SIGNUP,2000);
-}
-function joinTG(){
-fbq('track','Contact');
-setTimeout(()=>location.href=TG,1500);
+// Admin route
+if(location.hash==="#admin"){
+  userPage.style.display="none";
+  adminLogin.style.display="block";
 }
 
-// 🔐 ADMIN MODE
-if(location.hash === "#admin"){
-  document.getElementById("userPage").style.display="none";
-  document.getElementById("adminLogin").style.display="block";
+// Login
+function login(){
+auth.signInWithEmailAndPassword(adminEmail.value,adminPass.value)
+.then(()=>{
+ adminLogin.style.display="none";
+ adminDash.style.display="block";
+ loadUsers();
+})
+.catch(()=>err.innerText="Invalid login");
 }
 
-function adminLogin(){
-  auth.signInWithEmailAndPassword(
-    adminEmail.value,
-    adminPass.value
-  ).then(()=>{
-    adminLoginBox();
-  }).catch(()=>{
-    adminError.innerText="Invalid login";
-  });
-}
-
-function adminLoginBox(){
-  document.getElementById("adminLogin").style.display="none";
-  document.getElementById("adminDash").style.display="block";
-}
-
+// Logout
 function logout(){
-  auth.signOut().then(()=>{
-    location.href=location.pathname;
-  });
+auth.signOut().then(()=>location.href=location.pathname);
+}
+
+// Save settings
+function saveSettings(){
+db.ref("settings").set({
+ logo:logoInp.value,
+ title:titleInp.value,
+ sub:subInp.value,
+ regText:regTextInp.value,
+ regLink:regLinkInp.value,
+ tgText:tgTextInp.value,
+ tgLink:tgLinkInp.value
+});
+saveMsg.innerText="Saved ✅";
+}
+
+// Load settings to site
+db.ref("settings").on("value",s=>{
+ if(!s.exists())return;
+ const d=s.val();
+ siteLogo.src=d.logo||"";
+ siteTitle.innerText=d.title||"";
+ siteSub.innerText=d.sub||"";
+ btnReg.innerText=d.regText||"Register";
+ btnReg.onclick=()=>location.href=d.regLink;
+ btnTG.innerText=d.tgText||"Telegram";
+ btnTG.onclick=()=>location.href=d.tgLink;
+});
+
+// User logging
+const uid="u"+Date.now();
+db.ref("users/"+uid).set({
+ time:new Date().toLocaleString(),
+ device:/Mobi/.test(navigator.userAgent)?"Mobile":"Desktop"
+});
+
+// Load user list
+function loadUsers(){
+db.ref("users").on("value",s=>{
+ userList.innerHTML="";
+ s.forEach(c=>{
+  const u=c.val();
+  userList.innerHTML+=`${u.time} - ${u.device}<br>`;
+ });
+});
 }
 </script>
 
