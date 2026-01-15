@@ -15,8 +15,7 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-
-fbq('init','YOUR_PIXEL_ID'); 
+fbq('init','YOUR_PIXEL_ID');
 fbq('track','PageView');
 </script>
 
@@ -40,7 +39,7 @@ background:rgba(255,215,0,.08);
 border-radius:20px;
 box-shadow:0 0 40px rgba(255,215,0,.25);
 }
-h1{text-align:center;}
+h1,h2{text-align:center;}
 .stats{
 display:flex;
 gap:10px;
@@ -81,32 +80,63 @@ text-decoration:none;
 color:#000;
 box-shadow:0 0 25px rgba(255,215,0,.7);
 }
+input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+margin-bottom:10px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<h1>👑 Gold VIP Access</h1>
+<!-- USER LANDING -->
+<div id="userPage">
+  <div class="container">
+    <h1>👑 Gold VIP Access</h1>
 
-<div class="stats">
-<div class="stat">
-<h2 id="live">0</h2>
-<p>Live Users</p>
-</div>
-<div class="stat">
-<h2 id="reg">0</h2>
-<p>Registrations</p>
-</div>
+    <div class="stats">
+      <div class="stat">
+        <h2 id="live">0</h2>
+        <p>Live Users</p>
+      </div>
+      <div class="stat">
+        <h2 id="reg">0</h2>
+        <p>Registrations</p>
+      </div>
+    </div>
+
+    <div class="timer">
+      ⏳ Offer Ends In<br>
+      <strong id="time"></strong>
+    </div>
+
+    <button class="btn" onclick="register()">Free Registration</button>
+    <button class="btn" onclick="joinTG()">Join Telegram</button>
+  </div>
 </div>
 
-<div class="timer">
-⏳ Offer Ends In<br>
-<strong id="time"></strong>
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" style="display:none">
+  <div class="container">
+    <h2>🔐 Admin Login</h2>
+    <input id="adminEmail" type="email" placeholder="Admin Email">
+    <input id="adminPass" type="password" placeholder="Password">
+    <button class="btn" onclick="adminLogin()">Login</button>
+    <p id="adminError" style="color:red;text-align:center"></p>
+  </div>
 </div>
 
-<button class="btn" onclick="register()">Free Registration</button>
-<button class="btn" onclick="joinTG()">Join Telegram</button>
+<!-- ADMIN DASHBOARD -->
+<div id="adminDash" style="display:none">
+  <div class="container">
+    <h2>📊 Admin Dashboard</h2>
+    <p>Live Users: <strong id="a_live">0</strong></p>
+    <p>Total Registrations: <strong id="a_reg">0</strong></p>
+    <button class="btn" onclick="logout()">Logout</button>
+  </div>
 </div>
 
 <!-- Telegram Support -->
@@ -126,7 +156,7 @@ s0.parentNode.insertBefore(s1,s0);
 </script>
 
 <script>
-// 🔗 LINKS (CHANGE THESE)
+// 🔗 CHANGE THESE LINKS
 const SIGNUP = "https://example.com/signup";
 const TG = "https://t.me/yourchannel";
 
@@ -138,11 +168,18 @@ firebase.initializeApp({
 });
 
 const db = firebase.database();
+const auth = firebase.auth();
 
 // Live users
 db.ref("live").transaction(n => (n || 0) + 1);
-db.ref("live").on("value", s => live.innerText = s.val() || 0);
-db.ref("reg").on("value", s => reg.innerText = s.val() || 0);
+db.ref("live").on("value", s => {
+  live.innerText = s.val() || 0;
+  a_live.innerText = s.val() || 0;
+});
+db.ref("reg").on("value", s => {
+  reg.innerText = s.val() || 0;
+  a_reg.innerText = s.val() || 0;
+});
 
 // Countdown
 let end = localStorage.endTime || Date.now() + 3600000;
@@ -150,7 +187,7 @@ localStorage.endTime = end;
 setInterval(()=>{
 let d=end-Date.now();
 if(d<0)d=0;
-time.innerText=
+time.innerText =
 Math.floor(d/60000)+"m "+
 Math.floor((d%60000)/1000)+"s";
 },1000);
@@ -164,6 +201,34 @@ setTimeout(()=>location.href=SIGNUP,2000);
 function joinTG(){
 fbq('track','Contact');
 setTimeout(()=>location.href=TG,1500);
+}
+
+// 🔐 ADMIN MODE
+if(location.hash === "#admin"){
+  document.getElementById("userPage").style.display="none";
+  document.getElementById("adminLogin").style.display="block";
+}
+
+function adminLogin(){
+  auth.signInWithEmailAndPassword(
+    adminEmail.value,
+    adminPass.value
+  ).then(()=>{
+    adminLoginBox();
+  }).catch(()=>{
+    adminError.innerText="Invalid login";
+  });
+}
+
+function adminLoginBox(){
+  document.getElementById("adminLogin").style.display="none";
+  document.getElementById("adminDash").style.display="block";
+}
+
+function logout(){
+  auth.signOut().then(()=>{
+    location.href=location.pathname;
+  });
 }
 </script>
 
